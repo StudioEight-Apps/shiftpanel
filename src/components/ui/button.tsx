@@ -15,6 +15,8 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        approve: "bg-status-approved text-primary-foreground hover:bg-status-approved/90 shadow-lg shadow-status-approved/20",
+        decline: "bg-status-declined text-primary-foreground hover:bg-status-declined/90 shadow-lg shadow-status-declined/20",
       },
       size: {
         default: "h-10 px-4 py-2",
