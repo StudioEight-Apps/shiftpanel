@@ -132,7 +132,6 @@ export interface CarListing extends ListingBase {
   pricePerDay: number;
   bodyStyle: string;
   seats: number;
-  power: string;
   transmission: "Automatic" | "Manual";
 }
 

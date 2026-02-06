@@ -154,25 +154,25 @@ export const mockCars: CarListing[] = [
   {
     id: "c1", type: "car", name: "Lamborghini Huracán EVO", description: "V10 naturally aspirated supercar.",
     location: "Mykonos, Greece", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    brand: "Lamborghini", model: "Huracán EVO", pricePerDay: 800, bodyStyle: "Coupe", seats: 2, power: "640 HP", transmission: "Automatic",
+    brand: "Lamborghini", model: "Huracán EVO", pricePerDay: 800, bodyStyle: "Coupe", seats: 2, transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "c2", type: "car", name: "Porsche 911 Turbo S", description: "The ultimate sports car experience.",
     location: "Amalfi Coast, Italy", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    brand: "Porsche", model: "911 Turbo S", pricePerDay: 650, bodyStyle: "Coupe", seats: 4, power: "640 HP", transmission: "Automatic",
+    brand: "Porsche", model: "911 Turbo S", pricePerDay: 650, bodyStyle: "Coupe", seats: 4, transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "c3", type: "car", name: "Rolls-Royce Cullinan", description: "Ultra-luxury SUV for the discerning traveler.",
     location: "Dubai, UAE", photos: [], sourceType: "pms", sourceName: "FleetSync", status: "active", featured: false,
-    brand: "Rolls-Royce", model: "Cullinan", pricePerDay: 1100, bodyStyle: "SUV", seats: 5, power: "563 HP", transmission: "Automatic",
+    brand: "Rolls-Royce", model: "Cullinan", pricePerDay: 1100, bodyStyle: "SUV", seats: 5, transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: ["2026-02-05", "2026-02-06"], lastSynced: new Date("2026-02-04"),
   },
   {
     id: "c4", type: "car", name: "Mercedes-AMG GT", description: "A grand tourer with blistering performance.",
     location: "Bali, Indonesia", photos: [], sourceType: "shift_fleet", status: "hidden", featured: false,
-    brand: "Mercedes-Benz", model: "AMG GT", pricePerDay: 500, bodyStyle: "Roadster", seats: 2, power: "523 HP", transmission: "Manual",
+    brand: "Mercedes-Benz", model: "AMG GT", pricePerDay: 500, bodyStyle: "Roadster", seats: 2, transmission: "Manual",
     blockedDates: [], syncedBlockedDates: [],
   },
 ];
