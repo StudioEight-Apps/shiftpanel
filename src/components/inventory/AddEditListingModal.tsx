@@ -66,7 +66,6 @@ export function AddEditListingModal({
   const [pricePerDay, setPricePerDay] = useState(0);
   const [bodyStyle, setBodyStyle] = useState("");
   const [seats, setSeats] = useState(2);
-  const [power, setPower] = useState("");
   const [transmission, setTransmission] = useState<"Automatic" | "Manual">("Automatic");
 
   // Yacht
@@ -100,7 +99,6 @@ export function AddEditListingModal({
         setPricePerDay(listing.pricePerDay);
         setBodyStyle(listing.bodyStyle);
         setSeats(listing.seats);
-        setPower(listing.power);
         setTransmission(listing.transmission);
       } else if (listing.type === "yacht") {
         setPricePerHour(listing.pricePerHour);
@@ -130,7 +128,6 @@ export function AddEditListingModal({
       setPricePerDay(0);
       setBodyStyle("");
       setSeats(2);
-      setPower("");
       setTransmission("Automatic");
       setPricePerHour(0);
       setYachtLength("");
@@ -186,7 +183,6 @@ export function AddEditListingModal({
           pricePerDay,
           bodyStyle,
           seats,
-          power,
           transmission,
         };
         break;
@@ -303,9 +299,6 @@ export function AddEditListingModal({
               </Section>
               <Section title="Pricing">
                 <Field label="Price per day ($)" value={String(pricePerDay)} onChange={(v) => setPricePerDay(Number(v) || 0)} type="number" readOnly={isExternalSource} />
-              </Section>
-              <Section title="Specifications">
-                <Field label="Power" value={power} onChange={setPower} readOnly={isExternalSource} placeholder="e.g., 640 HP" />
               </Section>
               <Section title="Location">
                 <DropdownField
