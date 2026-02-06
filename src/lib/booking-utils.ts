@@ -1,6 +1,14 @@
 import { BookingRequest, BookingStatus, ItemStatus } from "./types";
 import { format, formatDistanceToNow } from "date-fns";
 
+function isAllDatesPast(booking: BookingRequest): boolean {
+  const now = new Date();
+  if (booking.villa && booking.villa.checkOut >= now) return false;
+  if (booking.car && booking.car.dropoffDate >= now) return false;
+  if (booking.yacht && booking.yacht.date >= now) return false;
+  return true;
+}
+
 export function deriveBookingStatus(booking: BookingRequest): BookingStatus {
   const statuses: ItemStatus[] = [];
   if (booking.villa) statuses.push(booking.villa.status);
@@ -8,7 +16,9 @@ export function deriveBookingStatus(booking: BookingRequest): BookingStatus {
   if (booking.yacht) statuses.push(booking.yacht.status);
 
   if (statuses.length === 0) return "Pending";
-  if (statuses.every((s) => s === "Approved")) return "Approved";
+  if (statuses.every((s) => s === "Approved")) {
+    return isAllDatesPast(booking) ? "Completed" : "Approved";
+  }
   if (statuses.every((s) => s === "Declined")) return "Declined";
   if (statuses.every((s) => s === "Pending")) return "Pending";
   return "Partial";
@@ -38,12 +48,13 @@ export function formatRelative(date: Date): string {
   return formatDistanceToNow(date, { addSuffix: true });
 }
 
-export function getStatusVariant(status: BookingStatus | ItemStatus): "pending" | "approved" | "declined" | "partial" {
+export function getStatusVariant(status: BookingStatus | ItemStatus): "pending" | "approved" | "declined" | "partial" | "completed" {
   switch (status) {
     case "Pending": return "pending";
     case "Approved": return "approved";
     case "Declined": return "declined";
     case "Partial": return "partial";
+    case "Completed": return "completed";
     default: return "pending";
   }
 }
