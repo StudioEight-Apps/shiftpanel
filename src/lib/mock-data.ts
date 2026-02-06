@@ -95,27 +95,27 @@ export const mockUsers: UserProfile[] = [
     uid: "u1", name: "James Whitfield", email: "james@whitfield.com", phone: "+1 (305) 555-0142",
     totalTrips: 3, lastTripDate: new Date("2025-12-20"), lifetimeValue: 42500, createdAt: new Date("2024-06-15"),
     notes: [{ text: "Prefers private transfers.", author: "owner@shiftrentals.com", timestamp: new Date("2025-10-01") }],
-    bookings: ["BR-1001"],
+    bookings: ["BR-1001"], status: "active",
   },
   {
     uid: "u2", name: "Sophia Laurent", email: "sophia@laurent.co", phone: "+33 6 12 34 56 78",
     totalTrips: 7, lastTripDate: new Date("2026-01-10"), lifetimeValue: 128000, createdAt: new Date("2023-03-20"),
-    notes: [], bookings: ["BR-1002"],
+    notes: [], bookings: ["BR-1002"], status: "active",
   },
   {
     uid: "u3", name: "Ahmed Al-Rashidi", email: "ahmed@alrashidi.ae", phone: "+971 50 123 4567",
     totalTrips: 1, lastTripDate: null, lifetimeValue: 0, createdAt: new Date("2026-01-28"),
-    notes: [], bookings: ["BR-1003"],
+    notes: [], bookings: ["BR-1003"], status: "active",
   },
   {
     uid: "u4", name: "Elena Vasquez", email: "elena@vasquez.mx", phone: "+52 55 1234 5678",
     totalTrips: 5, lastTripDate: new Date("2026-01-05"), lifetimeValue: 87000, createdAt: new Date("2024-01-10"),
-    notes: [], bookings: ["BR-1004"],
+    notes: [], bookings: ["BR-1004"], status: "active",
   },
   {
     uid: "u5", name: "Oliver Chen", email: "oliver@chen.hk", phone: "+852 9876 5432",
     totalTrips: 2, lastTripDate: new Date("2025-11-15"), lifetimeValue: 31000, createdAt: new Date("2024-09-01"),
-    notes: [], bookings: ["BR-1005"],
+    notes: [], bookings: ["BR-1005"], status: "deactivated",
   },
 ];
 
