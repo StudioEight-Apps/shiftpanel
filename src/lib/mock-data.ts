@@ -154,25 +154,25 @@ export const mockCars: CarListing[] = [
   {
     id: "c1", type: "car", name: "Lamborghini Huracán EVO", description: "V10 naturally aspirated supercar.",
     location: "Mykonos, Greece", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    brand: "Lamborghini", model: "Huracán EVO", pricePerDay: 800, bodyStyle: "Coupe", seats: 2, power: "640 HP",
+    brand: "Lamborghini", model: "Huracán EVO", pricePerDay: 800, bodyStyle: "Coupe", seats: 2, power: "640 HP", transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "c2", type: "car", name: "Porsche 911 Turbo S", description: "The ultimate sports car experience.",
     location: "Amalfi Coast, Italy", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    brand: "Porsche", model: "911 Turbo S", pricePerDay: 650, bodyStyle: "Coupe", seats: 4, power: "640 HP",
+    brand: "Porsche", model: "911 Turbo S", pricePerDay: 650, bodyStyle: "Coupe", seats: 4, power: "640 HP", transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "c3", type: "car", name: "Rolls-Royce Cullinan", description: "Ultra-luxury SUV for the discerning traveler.",
     location: "Dubai, UAE", photos: [], sourceType: "pms", sourceName: "FleetSync", status: "active", featured: false,
-    brand: "Rolls-Royce", model: "Cullinan", pricePerDay: 1100, bodyStyle: "SUV", seats: 5, power: "563 HP",
+    brand: "Rolls-Royce", model: "Cullinan", pricePerDay: 1100, bodyStyle: "SUV", seats: 5, power: "563 HP", transmission: "Automatic",
     blockedDates: [], syncedBlockedDates: ["2026-02-05", "2026-02-06"], lastSynced: new Date("2026-02-04"),
   },
   {
     id: "c4", type: "car", name: "Mercedes-AMG GT", description: "A grand tourer with blistering performance.",
     location: "Bali, Indonesia", photos: [], sourceType: "shift_fleet", status: "hidden", featured: false,
-    brand: "Mercedes-Benz", model: "AMG GT", pricePerDay: 500, bodyStyle: "Roadster", seats: 2, power: "523 HP",
+    brand: "Mercedes-Benz", model: "AMG GT", pricePerDay: 500, bodyStyle: "Roadster", seats: 2, power: "523 HP", transmission: "Manual",
     blockedDates: [], syncedBlockedDates: [],
   },
 ];
@@ -181,19 +181,19 @@ export const mockYachts: YachtListing[] = [
   {
     id: "y1", type: "yacht", name: "Azimut Grande", description: "77-foot luxury motor yacht with full crew.",
     location: "Amalfi Coast, Italy", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    pricePerHour: 1200, length: "77 ft", maxGuests: 12, crewIncluded: true, amenities: ["Jacuzzi", "Water Toys", "Full Bar", "Chef"],
+    pricePerHour: 1200, length: "77 ft", maxGuests: 12, captainIncluded: true, amenities: ["Jacuzzi", "Water Toys", "Full Bar", "Chef"],
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "y2", type: "yacht", name: "Sunseeker Predator", description: "68-foot performance yacht built for speed and luxury.",
     location: "Dubai Marina, UAE", photos: [], sourceType: "shift_fleet", status: "active", featured: true,
-    pricePerHour: 900, length: "68 ft", maxGuests: 10, crewIncluded: true, amenities: ["Flybridge", "Sound System", "Snorkeling Gear"],
+    pricePerHour: 900, length: "68 ft", maxGuests: 10, captainIncluded: true, amenities: ["Flybridge", "Sound System", "Snorkeling Gear"],
     blockedDates: [], syncedBlockedDates: [],
   },
   {
     id: "y3", type: "yacht", name: "Princess V65", description: "Elegant 65-foot cruiser for Mediterranean escapes.",
     location: "Mykonos, Greece", photos: [], sourceType: "api", sourceName: "Click&Boat", status: "active", featured: false,
-    pricePerHour: 750, length: "65 ft", maxGuests: 8, crewIncluded: false, amenities: ["Sun Deck", "BBQ", "Diving Equipment"],
+    pricePerHour: 750, length: "65 ft", maxGuests: 8, captainIncluded: false, amenities: ["Sun Deck", "BBQ", "Diving Equipment"],
     blockedDates: [], syncedBlockedDates: [], lastSynced: new Date("2026-02-02"),
   },
 ];

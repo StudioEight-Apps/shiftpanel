@@ -6,6 +6,7 @@ import { hasPermission, maskEmail, maskPhone } from "@/lib/permissions";
 import { formatDate, formatPrice } from "@/lib/booking-utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -211,6 +212,10 @@ export default function UsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => navigate(`/users/${user.uid}`)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit Profile
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleToggleStatus(user)}>
                             {user.status === "active" ? (
                               <>

@@ -9,8 +9,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Info } from "lucide-react";
+import { PhotoUpload } from "./PhotoUpload";
+import { CAR_BRANDS, BODY_TYPES, TRANSMISSIONS, CITIES } from "@/lib/constants";
 import type { Listing, SourceType } from "@/lib/types";
 
 interface AddEditListingModalProps {
@@ -36,6 +45,9 @@ export function AddEditListingModal({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [status, setStatus] = useState<"active" | "hidden">("active");
+  const [featured, setFeatured] = useState(false);
 
   // Villa
   const [pricePerNight, setPricePerNight] = useState(0);
@@ -55,12 +67,13 @@ export function AddEditListingModal({
   const [bodyStyle, setBodyStyle] = useState("");
   const [seats, setSeats] = useState(2);
   const [power, setPower] = useState("");
+  const [transmission, setTransmission] = useState<"Automatic" | "Manual">("Automatic");
 
   // Yacht
   const [pricePerHour, setPricePerHour] = useState(0);
   const [yachtLength, setYachtLength] = useState("");
   const [yachtMaxGuests, setYachtMaxGuests] = useState(6);
-  const [crewIncluded, setCrewIncluded] = useState(false);
+  const [captainIncluded, setCaptainIncluded] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +81,9 @@ export function AddEditListingModal({
       setName(listing.name);
       setDescription(listing.description);
       setLocation(listing.location);
+      setPhotos([...listing.photos]);
+      setStatus(listing.status);
+      setFeatured(listing.featured);
       if (listing.type === "villa") {
         setPricePerNight(listing.pricePerNight);
         setBedrooms(listing.bedrooms);
@@ -85,17 +101,21 @@ export function AddEditListingModal({
         setBodyStyle(listing.bodyStyle);
         setSeats(listing.seats);
         setPower(listing.power);
+        setTransmission(listing.transmission);
       } else if (listing.type === "yacht") {
         setPricePerHour(listing.pricePerHour);
         setYachtLength(listing.length);
         setYachtMaxGuests(listing.maxGuests);
-        setCrewIncluded(listing.crewIncluded);
+        setCaptainIncluded(listing.captainIncluded);
         setAmenitiesText(listing.amenities.join(", "));
       }
     } else {
       setName("");
       setDescription("");
       setLocation("");
+      setPhotos([]);
+      setStatus("active");
+      setFeatured(false);
       setPricePerNight(0);
       setBedrooms(1);
       setBathrooms(1);
@@ -111,10 +131,11 @@ export function AddEditListingModal({
       setBodyStyle("");
       setSeats(2);
       setPower("");
+      setTransmission("Automatic");
       setPricePerHour(0);
       setYachtLength("");
       setYachtMaxGuests(6);
-      setCrewIncluded(false);
+      setCaptainIncluded(false);
     }
   }, [open, listing]);
 
@@ -124,11 +145,11 @@ export function AddEditListingModal({
       name,
       description,
       location,
-      photos: listing?.photos ?? [],
+      photos,
       sourceType: listing?.sourceType ?? ("shift_fleet" as SourceType),
       sourceName: listing?.sourceName,
-      status: listing?.status ?? ("active" as const),
-      featured: listing?.featured ?? false,
+      status,
+      featured,
       blockedDates: listing?.blockedDates ?? [],
       syncedBlockedDates: listing?.syncedBlockedDates ?? [],
       lastSynced: listing?.lastSynced,
@@ -166,6 +187,7 @@ export function AddEditListingModal({
           bodyStyle,
           seats,
           power,
+          transmission,
         };
         break;
       case "yacht":
@@ -175,7 +197,7 @@ export function AddEditListingModal({
           pricePerHour,
           length: yachtLength,
           maxGuests: yachtMaxGuests,
-          crewIncluded,
+          captainIncluded,
           amenities,
         };
         break;
@@ -207,6 +229,11 @@ export function AddEditListingModal({
           <Section title="Basic Info">
             <Field label="Name" value={name} onChange={setName} readOnly={isExternalSource} />
             <Field label="Description" value={description} onChange={setDescription} readOnly={isExternalSource} textarea />
+          </Section>
+
+          {/* Photos */}
+          <Section title="Photos">
+            <PhotoUpload photos={photos} onChange={setPhotos} readOnly={isExternalSource} />
           </Section>
 
           {/* Villa-specific */}
@@ -244,22 +271,51 @@ export function AddEditListingModal({
             <>
               <Section title="Vehicle Details">
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Brand" value={brand} onChange={setBrand} readOnly={isExternalSource} />
+                  <DropdownField
+                    label="Brand"
+                    value={brand}
+                    onChange={setBrand}
+                    options={[...CAR_BRANDS]}
+                    readOnly={isExternalSource}
+                    placeholder="Select brand"
+                  />
                   <Field label="Model" value={modelName} onChange={setModelName} readOnly={isExternalSource} />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <DropdownField
+                    label="Body Type"
+                    value={bodyStyle}
+                    onChange={setBodyStyle}
+                    options={[...BODY_TYPES]}
+                    readOnly={isExternalSource}
+                    placeholder="Select body type"
+                  />
+                  <Field label="Seats" value={String(seats)} onChange={(v) => setSeats(Number(v) || 1)} type="number" readOnly={isExternalSource} />
+                  <DropdownField
+                    label="Transmission"
+                    value={transmission}
+                    onChange={(v) => setTransmission(v as "Automatic" | "Manual")}
+                    options={[...TRANSMISSIONS]}
+                    readOnly={isExternalSource}
+                    placeholder="Select"
+                  />
                 </div>
               </Section>
               <Section title="Pricing">
                 <Field label="Price per day ($)" value={String(pricePerDay)} onChange={(v) => setPricePerDay(Number(v) || 0)} type="number" readOnly={isExternalSource} />
               </Section>
               <Section title="Specifications">
-                <div className="grid grid-cols-3 gap-3">
-                  <Field label="Body Style" value={bodyStyle} onChange={setBodyStyle} readOnly={isExternalSource} />
-                  <Field label="Seats" value={String(seats)} onChange={(v) => setSeats(Number(v) || 1)} type="number" readOnly={isExternalSource} />
-                  <Field label="Power" value={power} onChange={setPower} readOnly={isExternalSource} placeholder="e.g., 640 HP" />
-                </div>
+                <Field label="Power" value={power} onChange={setPower} readOnly={isExternalSource} placeholder="e.g., 640 HP" />
               </Section>
               <Section title="Location">
-                <Field label="Location" value={location} onChange={setLocation} readOnly={isExternalSource} />
+                <DropdownField
+                  label="City"
+                  value={location}
+                  onChange={setLocation}
+                  options={[...CITIES]}
+                  readOnly={isExternalSource}
+                  placeholder="Select city"
+                />
               </Section>
             </>
           )}
@@ -275,30 +331,62 @@ export function AddEditListingModal({
                   <Field label="Length" value={yachtLength} onChange={setYachtLength} readOnly={isExternalSource} placeholder="e.g., 77 ft" />
                   <Field label="Max Guests" value={String(yachtMaxGuests)} onChange={(v) => setYachtMaxGuests(Number(v) || 1)} type="number" readOnly={isExternalSource} />
                 </div>
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-secondary/50 px-4 py-3">
+                  <div>
+                    <Label className="text-sm font-medium">Captain included</Label>
+                    <p className="text-xs text-muted-foreground">Includes a professional captain</p>
+                  </div>
                   {isExternalSource ? (
-                    <p className="text-sm text-foreground">
-                      Crew included: {crewIncluded ? "Yes" : "No"}
-                    </p>
+                    <p className="text-sm font-medium text-foreground">{captainIncluded ? "Yes" : "No"}</p>
                   ) : (
-                    <>
-                      <Checkbox
-                        checked={crewIncluded}
-                        onCheckedChange={(c) => setCrewIncluded(c === true)}
-                      />
-                      <Label className="text-sm">Crew included</Label>
-                    </>
+                    <Switch
+                      checked={captainIncluded}
+                      onCheckedChange={setCaptainIncluded}
+                    />
                   )}
                 </div>
               </Section>
               <Section title="Location">
-                <Field label="Location" value={location} onChange={setLocation} readOnly={isExternalSource} />
+                <DropdownField
+                  label="City"
+                  value={location}
+                  onChange={setLocation}
+                  options={[...CITIES]}
+                  readOnly={isExternalSource}
+                  placeholder="Select city"
+                />
               </Section>
               <Section title="Amenities">
                 <Field label="Amenities (comma-separated)" value={amenitiesText} onChange={setAmenitiesText} readOnly={isExternalSource} placeholder="Jacuzzi, Water Toys, Full Bar..." />
               </Section>
             </>
           )}
+
+          {/* Status & Featured — always at the bottom */}
+          <Section title="Visibility">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg border border-border bg-secondary/50 px-4 py-3">
+                <div>
+                  <Label className="text-sm font-medium">Active</Label>
+                  <p className="text-xs text-muted-foreground">Listing is visible to customers</p>
+                </div>
+                <Switch
+                  checked={status === "active"}
+                  onCheckedChange={(checked) => setStatus(checked ? "active" : "hidden")}
+                />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border border-border bg-secondary/50 px-4 py-3">
+                <div>
+                  <Label className="text-sm font-medium">Featured</Label>
+                  <p className="text-xs text-muted-foreground">Show in featured listings section</p>
+                </div>
+                <Switch
+                  checked={featured}
+                  onCheckedChange={setFeatured}
+                />
+              </div>
+            </div>
+          </Section>
         </div>
 
         <div className="flex justify-end gap-2 border-t border-border pt-4">
@@ -374,6 +462,49 @@ function Field({
           className="mt-1 border-border bg-secondary"
         />
       )}
+    </div>
+  );
+}
+
+function DropdownField({
+  label,
+  value,
+  onChange,
+  options,
+  readOnly,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  readOnly?: boolean;
+  placeholder?: string;
+}) {
+  if (readOnly) {
+    return (
+      <div>
+        <p className="mb-1 text-xs text-muted-foreground">{label}</p>
+        <p className="text-sm text-foreground">{value || "—"}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="mt-1 border-border bg-secondary">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

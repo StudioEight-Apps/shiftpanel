@@ -133,6 +133,7 @@ export interface CarListing extends ListingBase {
   bodyStyle: string;
   seats: number;
   power: string;
+  transmission: "Automatic" | "Manual";
 }
 
 export interface YachtListing extends ListingBase {
@@ -140,7 +141,7 @@ export interface YachtListing extends ListingBase {
   pricePerHour: number;
   length: string;
   maxGuests: number;
-  crewIncluded: boolean;
+  captainIncluded: boolean;
   amenities: string[];
 }
 
