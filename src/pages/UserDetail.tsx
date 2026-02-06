@@ -7,9 +7,10 @@ import { formatDate, formatPrice, deriveBookingStatus, getStatusVariant, formatR
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Mail, Phone, Send, Home, Car, Ship, Check, X, Clock } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Send, Home, Car, Ship, Check, X, Clock, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ItemStatus, ItemType } from "@/lib/types";
+import { EditProfileModal } from "@/components/users/EditProfileModal";
 
 type TabType = "profile" | "trips" | "activity";
 
@@ -35,6 +36,7 @@ export default function UserDetail() {
   const { role, user: adminUser } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("profile");
   const [newNote, setNewNote] = useState("");
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
 
   const showPII = role ? hasPermission(role, "view_pii") : false;
   const canNote = role ? hasPermission(role, "add_user_notes") : false;
@@ -104,7 +106,20 @@ export default function UserDetail() {
           <div className="space-y-4">
             {/* Contact */}
             <div className="rounded-xl border border-border bg-card p-5">
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contact</h2>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contact</h2>
+                {canEditLTV && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                    onClick={() => setEditProfileOpen(true)}
+                  >
+                    <Pencil className="h-3 w-3" />
+                    Edit
+                  </Button>
+                )}
+              </div>
               <p className="text-lg font-semibold text-foreground">{userProfile.name}</p>
               <div className="mt-2 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-primary">
@@ -258,6 +273,16 @@ export default function UserDetail() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {userProfile && (
+        <EditProfileModal
+          open={editProfileOpen}
+          onOpenChange={setEditProfileOpen}
+          user={userProfile}
+          onSave={(updated) => setUserProfile(updated)}
+        />
       )}
     </div>
   );
