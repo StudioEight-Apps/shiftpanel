@@ -1,18 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { mockVillas, mockCars, mockYachts } from "@/lib/mock-data";
+import { mockVillas, mockCars, mockYachts, mockCatalogVillas } from "@/lib/mock-data";
 import { formatPrice } from "@/lib/booking-utils";
 import { hasPermission } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { Plus, Calendar, Pencil, Trash2, Home, Car, Ship, Search } from "lucide-react";
+import { Plus, Calendar, Pencil, Trash2, Home, Car, Ship, Search, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Listing, VillaListing, CarListing, YachtListing, SourceType } from "@/lib/types";
 import { AddEditListingModal } from "@/components/inventory/AddEditListingModal";
 import { CalendarModal } from "@/components/inventory/CalendarModal";
 import { DeleteConfirmDialog } from "@/components/inventory/DeleteConfirmDialog";
+import { ImportCatalogSheet, type CatalogVilla } from "@/components/inventory/ImportCatalogSheet";
 
 type Tab = "villas" | "cars" | "yachts";
 type SourceFilter = "all" | "shift_fleet" | "external";
@@ -53,8 +54,10 @@ export default function Inventory() {
   const [addEditOpen, setAddEditOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [importedCatalogIds, setImportedCatalogIds] = useState<Set<string>>(new Set());
 
   const canEdit = role ? hasPermission(role, "add_edit_listings") : false;
   const canDelete = role ? hasPermission(role, "delete_listings") : false;
@@ -180,6 +183,35 @@ export default function Inventory() {
     setSelectedListing((prev) => (prev ? { ...prev, blockedDates } : prev));
   };
 
+  const handleImportVilla = useCallback((catalogVilla: CatalogVilla) => {
+    const newVilla: VillaListing = {
+      id: `imported-${catalogVilla.id}`,
+      type: "villa",
+      name: catalogVilla.name,
+      description: `Imported from ${catalogVilla.provider}`,
+      location: catalogVilla.location,
+      photos: [],
+      sourceType: "pms",
+      sourceName: catalogVilla.provider,
+      status: "active",
+      featured: false,
+      blockedDates: [],
+      syncedBlockedDates: [],
+      lastSynced: new Date(),
+      pricePerNight: catalogVilla.pricePerNight,
+      bedrooms: catalogVilla.bedrooms,
+      bathrooms: catalogVilla.bathrooms,
+      maxGuests: catalogVilla.maxGuests,
+      amenities: [],
+      address: "",
+      neighborhood: "",
+      minimumStay: 1,
+      market: "",
+    };
+    setVillas((prev) => [...prev, newVilla]);
+    setImportedCatalogIds((prev) => new Set(prev).add(catalogVilla.id));
+  }, []);
+
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
@@ -191,10 +223,18 @@ export default function Inventory() {
           </p>
         </div>
         {canEdit && (
-          <Button onClick={handleAddNew}>
-            <Plus className="h-4 w-4" />
-            Add New
-          </Button>
+          <div className="flex items-center gap-2">
+            {activeTab === "villas" && (
+              <Button variant="outline" onClick={() => setImportOpen(true)}>
+                <Download className="h-4 w-4" />
+                Import from Catalog
+              </Button>
+            )}
+            <Button onClick={handleAddNew}>
+              <Plus className="h-4 w-4" />
+              Add New
+            </Button>
+          </div>
         )}
       </div>
 
@@ -370,6 +410,14 @@ export default function Inventory() {
         onOpenChange={setDeleteOpen}
         listingName={selectedListing?.name ?? ""}
         onConfirm={handleConfirmDelete}
+      />
+
+      <ImportCatalogSheet
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        catalogVillas={mockCatalogVillas}
+        importedIds={importedCatalogIds}
+        onImport={handleImportVilla}
       />
     </div>
   );

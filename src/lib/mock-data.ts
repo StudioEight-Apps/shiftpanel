@@ -2,6 +2,16 @@ import {
   BookingRequest, UserProfile, VillaListing, CarListing, YachtListing,
   type AdminUser,
 } from "./types";
+import type { CatalogVilla } from "@/components/inventory/ImportCatalogSheet";
+
+export const mockCatalogVillas: CatalogVilla[] = [
+  { id: "cat-v1", name: "Villa Serena", provider: "Guesty", location: "Tulum, Mexico", pricePerNight: 650, bedrooms: 3, bathrooms: 2, maxGuests: 6, photo: "" },
+  { id: "cat-v2", name: "Casa del Mare", provider: "Hostaway", location: "Amalfi Coast, Italy", pricePerNight: 1800, bedrooms: 5, bathrooms: 4, maxGuests: 12, photo: "" },
+  { id: "cat-v3", name: "The Lake House", provider: "Guesty", location: "Lake Como, Italy", pricePerNight: 2200, bedrooms: 4, bathrooms: 3, maxGuests: 8, photo: "" },
+  { id: "cat-v4", name: "Palm Grove Estate", provider: "Hostaway", location: "Bali, Indonesia", pricePerNight: 450, bedrooms: 4, bathrooms: 4, maxGuests: 10, photo: "" },
+  { id: "cat-v5", name: "Sunset Penthouse", provider: "Guesty", location: "Dubai, UAE", pricePerNight: 1500, bedrooms: 3, bathrooms: 3, maxGuests: 8, photo: "" },
+  { id: "cat-v6", name: "Chalet Blanc", provider: "Hostaway", location: "Aspen, Colorado", pricePerNight: 3200, bedrooms: 6, bathrooms: 5, maxGuests: 14, photo: "" },
+];
 
 export const mockAdminUsers: AdminUser[] = [
   { uid: "a1", email: "owner@shiftrentals.com", role: "owner", name: "Marcus Cole" },
