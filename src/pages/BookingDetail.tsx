@@ -1,13 +1,35 @@
 import { useState, useMemo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { mockBookings } from "@/lib/mock-data";
-import { deriveBookingStatus, formatDate, formatDateTime, formatPrice, formatRelative, getStatusVariant, getActiveTotal } from "@/lib/booking-utils";
+import {
+  deriveBookingStatus,
+  formatDate,
+  formatDateTime,
+  formatPrice,
+  formatRelative,
+  getStatusVariant,
+  getActiveTotal,
+} from "@/lib/booking-utils";
 import { hasPermission, maskEmail, maskPhone } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Home, Car, Ship, Check, X, Clock, Mail, Phone, Send, Undo2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Home,
+  Car,
+  Ship,
+  Check,
+  X,
+  Clock,
+  CheckCircle,
+  Mail,
+  Phone,
+  Send,
+  Undo2,
+  ChevronRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BookingRequest, ItemStatus, ItemType } from "@/lib/types";
 
@@ -19,12 +41,27 @@ function ItemIcon({ type, className }: { type: ItemType; className?: string }) {
   }
 }
 
-function StatusIcon({ status, className }: { status: ItemStatus; className?: string }) {
+function StatusIcon({ status, className }: { status: string; className?: string }) {
   switch (status) {
     case "Approved": return <Check className={cn("h-4 w-4", className)} />;
     case "Declined": return <X className={cn("h-4 w-4", className)} />;
     case "Pending": return <Clock className={cn("h-4 w-4", className)} />;
+    case "Completed": return <CheckCircle className={cn("h-4 w-4", className)} />;
+    case "Partial": return <Clock className={cn("h-4 w-4", className)} />;
+    default: return null;
   }
+}
+
+function getDateBlockedText(type: ItemType, data: any): string {
+  switch (type) {
+    case "villa": return `Dates blocked: ${formatDate(data.checkIn)} – ${formatDate(data.checkOut)}`;
+    case "car": return `Dates blocked: ${formatDate(data.pickupDate)} – ${formatDate(data.dropoffDate)}`;
+    case "yacht": return `Date blocked: ${formatDate(data.date)}`;
+  }
+}
+
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export default function BookingDetail() {
@@ -33,7 +70,6 @@ export default function BookingDetail() {
   const { role, user } = useAuth();
   const [newNote, setNewNote] = useState("");
 
-  // In production, this would be a real-time listener. Using mock data with local state for demo.
   const [booking, setBooking] = useState<BookingRequest | null>(() => {
     return mockBookings.find((b) => b.id === id) ?? null;
   });
@@ -48,20 +84,20 @@ export default function BookingDetail() {
   const handleAction = useCallback(
     (itemType: ItemType, action: ItemStatus) => {
       if (!booking || !user) return;
-      const currentStatus = booking[itemType]?.status;
-      if (currentStatus === action) return; // Idempotency guard
-
+      if (booking[itemType]?.status === action) return;
       setBooking((prev) => {
         if (!prev || !prev[itemType]) return prev;
-        const newLog = {
-          action: `${action === "Approved" ? "Approved" : action === "Declined" ? "Declined" : "Reset"} ${itemType}`,
-          actor: user.email,
-          timestamp: new Date(),
-        };
         return {
           ...prev,
           [itemType]: { ...prev[itemType]!, status: action },
-          activityLog: [newLog, ...prev.activityLog],
+          activityLog: [
+            {
+              action: `${action === "Approved" ? "Approved" : "Declined"} ${itemType}`,
+              actor: user.email,
+              timestamp: new Date(),
+            },
+            ...prev.activityLog,
+          ],
           updatedAt: new Date(),
         };
       });
@@ -74,15 +110,17 @@ export default function BookingDetail() {
       if (!booking || !user) return;
       setBooking((prev) => {
         if (!prev || !prev[itemType]) return prev;
-        const newLog = {
-          action: `Reset ${itemType} to pending`,
-          actor: user.email,
-          timestamp: new Date(),
-        };
         return {
           ...prev,
           [itemType]: { ...prev[itemType]!, status: "Pending" as ItemStatus },
-          activityLog: [newLog, ...prev.activityLog],
+          activityLog: [
+            {
+              action: `Reset ${itemType} to pending`,
+              actor: user.email,
+              timestamp: new Date(),
+            },
+            ...prev.activityLog,
+          ],
           updatedAt: new Date(),
         };
       });
@@ -130,7 +168,9 @@ export default function BookingDetail() {
         </button>
         <div>
           <h1 className="text-xl font-bold text-foreground">{booking.id}</h1>
-          <p className="text-xs text-muted-foreground">Submitted {formatRelative(booking.createdAt)}</p>
+          <p className="text-xs text-muted-foreground">
+            Submitted {formatRelative(booking.createdAt)}
+          </p>
         </div>
       </div>
 
@@ -139,8 +179,12 @@ export default function BookingDetail() {
         <div className="space-y-4 xl:col-span-2">
           {/* Customer Card */}
           <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</h2>
-            <p className="text-lg font-semibold text-foreground">{booking.customer.name}</p>
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Customer
+            </h2>
+            <p className="text-lg font-semibold text-foreground">
+              {booking.customer.name}
+            </p>
             <div className="mt-2 flex flex-wrap gap-4">
               <a
                 href={showPII ? `mailto:${booking.customer.email}` : undefined}
@@ -157,6 +201,12 @@ export default function BookingDetail() {
                 {showPII ? booking.customer.phone : maskPhone(booking.customer.phone)}
               </a>
             </div>
+            <Link
+              to={`/users/${booking.customer.uid}`}
+              className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              View Profile <ChevronRight className="h-3 w-3" />
+            </Link>
           </div>
 
           {/* Item Cards */}
@@ -171,14 +221,23 @@ export default function BookingDetail() {
                 )}
               >
                 {/* Header */}
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <ItemIcon type={type} className="text-primary" />
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                      <ItemIcon type={type} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        {type}
+                      </p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {data.name}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{type}</p>
-                    <p className="text-sm font-semibold text-foreground">{data.name}</p>
-                  </div>
+                  <p className={cn("text-lg font-bold text-foreground", isDeclined && "line-through")}>
+                    {formatPrice(data.price)}
+                  </p>
                 </div>
 
                 {/* Details Grid */}
@@ -190,7 +249,6 @@ export default function BookingDetail() {
                       <DetailCell label="Check-out" value={formatDate(data.checkOut)} />
                       <DetailCell label="Nights" value={String(data.nights)} />
                       <DetailCell label="Price/Night" value={formatPrice(data.pricePerNight)} />
-                      <DetailCell label="Total" value={formatPrice(data.price)} />
                     </>
                   )}
                   {type === "car" && (
@@ -199,7 +257,6 @@ export default function BookingDetail() {
                       <DetailCell label="Dropoff" value={formatDate(data.dropoffDate)} />
                       <DetailCell label="Days" value={String(data.days)} />
                       <DetailCell label="Price/Day" value={formatPrice(data.pricePerDay)} />
-                      <DetailCell label="Total" value={formatPrice(data.price)} />
                     </>
                   )}
                   {type === "yacht" && (
@@ -208,7 +265,6 @@ export default function BookingDetail() {
                       <DetailCell label="Time" value={`${data.startTime} – ${data.endTime}`} />
                       <DetailCell label="Hours" value={String(data.hours)} />
                       <DetailCell label="Price/Hour" value={formatPrice(data.pricePerHour)} />
-                      <DetailCell label="Total" value={formatPrice(data.price)} />
                     </>
                   )}
                 </div>
@@ -220,34 +276,32 @@ export default function BookingDetail() {
                       <Button
                         variant="approve"
                         size="lg"
-                        className="flex-1"
+                        className="flex-1 h-12 text-base"
                         onClick={() => handleAction(type, "Approved")}
                       >
                         <Check className="h-5 w-5" />
-                        Approve
+                        Approve {capitalize(type)}
                       </Button>
                       <Button
                         variant="decline"
                         size="lg"
-                        className="flex-1"
+                        className="flex-1 h-12 text-base"
                         onClick={() => handleAction(type, "Declined")}
                       >
                         <X className="h-5 w-5" />
-                        Decline
+                        Decline {capitalize(type)}
                       </Button>
                     </div>
                   )}
                   {data.status === "Approved" && (
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <Badge variant="approved" className="gap-1">
                           <Check className="h-3 w-3" /> Approved
                         </Badge>
-                        {type === "villa" && (
-                          <span className="text-xs text-muted-foreground">
-                            Dates blocked: {formatDate(data.checkIn)} – {formatDate(data.checkOut)}
-                          </span>
-                        )}
+                        <span className="text-xs text-muted-foreground">
+                          {getDateBlockedText(type, data)}
+                        </span>
                       </div>
                       {canAct && (
                         <button
@@ -286,14 +340,16 @@ export default function BookingDetail() {
 
           {/* Notes */}
           <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Internal Notes</h2>
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Internal Notes
+            </h2>
             {canNote && (
               <div className="mb-4 flex gap-2">
                 <Textarea
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   placeholder="Add a note..."
-                  className="min-h-[60px] bg-secondary border-border text-sm"
+                  className="min-h-[60px] border-border bg-secondary text-sm"
                 />
                 <Button size="icon" onClick={handleAddNote} disabled={!newNote.trim()}>
                   <Send className="h-4 w-4" />
@@ -321,12 +377,17 @@ export default function BookingDetail() {
         <div className="space-y-4">
           {/* Overall Status */}
           <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Booking Status</h2>
-            <Badge variant={getStatusVariant(status)} className="mb-3 gap-1 text-sm px-3 py-1">
-              <StatusIcon status={status as ItemStatus} className="h-4 w-4" />
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Booking Status
+            </h2>
+            <Badge
+              variant={getStatusVariant(status)}
+              className="mb-3 gap-1 px-3 py-1 text-sm"
+            >
+              <StatusIcon status={status} className="h-4 w-4" />
               {status}
             </Badge>
-            {status === "Partial" && (
+            {(status === "Partial") && (
               <div className="mt-3 space-y-2 border-t border-border pt-3">
                 {items.map(({ type, data }) => (
                   <div key={type} className="flex items-center justify-between text-sm">
@@ -345,7 +406,9 @@ export default function BookingDetail() {
 
           {/* Pricing Summary */}
           <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pricing Summary</h2>
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Pricing Summary
+            </h2>
             <div className="space-y-2">
               {items.map(({ type, data }) => (
                 <div
@@ -355,7 +418,7 @@ export default function BookingDetail() {
                     data.status === "Declined" && "text-muted-foreground line-through opacity-50"
                   )}
                 >
-                  <span className="capitalize text-foreground">{data.name}</span>
+                  <span className="text-foreground">{data.name}</span>
                   <span>{formatPrice(data.price)}</span>
                 </div>
               ))}
@@ -363,12 +426,16 @@ export default function BookingDetail() {
             <div className="mt-4 border-t border-border pt-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">Active Total</span>
-                <span className="text-lg font-bold text-primary">{formatPrice(activeTotal)}</span>
+                <span className="text-lg font-bold text-primary">
+                  {formatPrice(activeTotal)}
+                </span>
               </div>
               {activeTotal !== booking.grandTotal && (
                 <div className="mt-1 flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Original</span>
-                  <span className="text-xs text-muted-foreground line-through">{formatPrice(booking.grandTotal)}</span>
+                  <span className="text-xs text-muted-foreground line-through">
+                    {formatPrice(booking.grandTotal)}
+                  </span>
                 </div>
               )}
             </div>
@@ -376,7 +443,9 @@ export default function BookingDetail() {
 
           {/* Activity Timeline */}
           <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity</h2>
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Activity
+            </h2>
             <div className="space-y-3">
               {booking.activityLog.map((entry, i) => (
                 <div key={i} className="flex gap-3">

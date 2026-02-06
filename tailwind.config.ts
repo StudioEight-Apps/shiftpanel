@@ -62,6 +62,7 @@ export default {
           approved: "hsl(var(--status-approved))",
           declined: "hsl(var(--status-declined))",
           partial: "hsl(var(--status-partial))",
+          completed: "hsl(var(--status-completed))",
         },
         source: {
           shift: "hsl(var(--source-shift))",

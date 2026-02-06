@@ -2,7 +2,7 @@ export type UserRole = "owner" | "admin" | "viewer";
 
 export type ItemStatus = "Pending" | "Approved" | "Declined";
 
-export type BookingStatus = "Pending" | "Approved" | "Declined" | "Partial";
+export type BookingStatus = "Pending" | "Approved" | "Declined" | "Partial" | "Completed";
 
 export type ItemType = "villa" | "car" | "yacht";
 

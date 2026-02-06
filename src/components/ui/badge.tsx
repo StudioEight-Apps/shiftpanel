@@ -16,6 +16,7 @@ const badgeVariants = cva(
         approved: "border-transparent bg-status-approved/15 text-status-approved",
         declined: "border-transparent bg-status-declined/15 text-status-declined",
         partial: "border-transparent bg-status-partial/15 text-status-partial",
+        completed: "border-transparent bg-status-completed/15 text-status-completed",
         shift: "border-transparent bg-source-shift/15 text-source-shift",
         pms: "border-transparent bg-source-pms/15 text-source-pms",
         api: "border-transparent bg-source-api/15 text-source-api",
