@@ -96,7 +96,7 @@ export default function Inventory() {
   const getSubtitle = (listing: Listing) => {
     switch (listing.type) {
       case "villa": return `${listing.bedrooms} bed · ${listing.maxGuests} guests`;
-      case "car": return `${listing.bodyStyle} · ${listing.seats} seats`;
+      case "car": return `${listing.bodyStyle} · ${listing.seats} seats · ${listing.transmission}`;
       case "yacht": return `${listing.length} · ${listing.maxGuests} guests`;
     }
   };
