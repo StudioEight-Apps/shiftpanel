@@ -94,6 +94,7 @@ export interface UserProfile {
   createdAt: Date;
   notes: BookingNote[];
   bookings: string[]; // booking IDs
+  status: "active" | "deactivated";
 }
 
 export interface ListingBase {
